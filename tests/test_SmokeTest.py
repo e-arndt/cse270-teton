@@ -7,6 +7,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
@@ -14,9 +15,8 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 class TestSmokeTest():
   def setup_method(self, method):
     options = Options()
-    options.add_argument("--headless")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--headless=new")
+    options.add_argument("--window-size=1400,3000")
 
     self.driver = webdriver.Chrome(options=options)
     self.vars = {}
@@ -26,7 +26,6 @@ class TestSmokeTest():
   
   def test_01CommonBrowserTab(self):
     self.driver.get("http://127.0.0.1:5500/teton/1.6/index.html")
-    self.driver.set_window_size(1190, 3000)
     assert self.driver.title == "Teton Idaho CoC"
   
   def test_02CommonLogo(self):
@@ -85,6 +84,10 @@ class TestSmokeTest():
     self.driver.find_element(By.NAME, "biztitle").send_keys("CEO")
 
     self.driver.find_element(By.NAME, "submit").click()
+
+    WebDriverWait(self.driver, 5).until(
+        EC.presence_of_element_located((By.NAME, "email"))
+    )
 
     elements = self.driver.find_elements(By.NAME, "email")
     assert len(elements) > 0
